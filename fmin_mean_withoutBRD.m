@@ -1,36 +1,36 @@
-%% 内点法求解约束非线性最优化问题
-% 将方程组转换为残差形式
+%% The interior point method is used to solve constrained nonlinear optimization problems
+% The system of equations is converted to residual form
 residuals = @(x) biological_interactions(x)
     
-% 定义目标函数（残差的平方和）
+% Define the objective function (sum of squares of residuals)
 objective = @(x) sum(residuals(x).^2)
 y = randi([0, 3], 1, 14);
 for i=1:100
     x0 = randi([0, 10], 1, 14);   
-    % 没有线性或非线性约束，因此 A, b, Aeq, beq, lb, ub 均为空
+    % There are no linear or nonlinear constraints, so A, b, Aeq, beq, lb, ub are all empty
     A = -eye(14);
     b = zeros(14, 1);
 %     A = [];
 %     b = [];
     Aeq = [];
     beq = [];
-    lb = []; % 如果有变量下界，则在这里定义
-    ub = []; % 如果有变量上界，则在这里定义
-    % 使用 fmincon 求解
+    lb = []; % If there is a lower bound for a variable, it is defined here
+    ub = []; % If there is an upper bound on a variable, it is defined here
+    % fmincon solve
         options = optimoptions('fmincon', 'Display', 'iter', 'Algorithm', 'sqp');
         [x, fval] = fmincon(objective, x0, A, b, Aeq, beq, lb, ub, [], options);
         x0 = round(x * 10^8) / 10^8;
-        % 显示结果
+        % displaying results
         disp('Solution:');
         disp(x0);
         disp('Objective function value at the solution:');
         disp(fval);
 
-        % 检查残差是否足够小
+        % Check if the residual is small enough
         residual_norm = norm(residuals(x));
         disp(['Residual norm:', num2str(residual_norm)]);
 
-        % 如果残差足够小，可以认为找到了方程组的解
+        % If the residual is small enough, the solution to the system can be considered found
         if residual_norm < 1e-6
             disp('The solution is considered acceptable.');
             y = [y;x0];
@@ -39,7 +39,7 @@ for i=1:100
         end
 end
 tabulate(y(:,1))
-%% 网络
+%% GRN without BRD
 function F = biological_interactions(x) %the biological interactions between genes
 a=1.1;
 b=2;
