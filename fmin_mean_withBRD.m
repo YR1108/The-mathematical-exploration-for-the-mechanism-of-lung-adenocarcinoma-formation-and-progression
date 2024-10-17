@@ -1,8 +1,8 @@
-%% 内点法求解约束非线性最优化问题
-% 将方程组转换为残差形式
+%% The interior point method is used to solve constrained nonlinear optimization problems
+% The system of equations is converted to residual form
 residuals = @(x) biological_interactions(x)
     
-% 定义目标函数（残差的平方和）
+% Define the objective function (sum of squares of residuals)
 objective = @(x) sum(residuals(x).^2)
 y = randi([0, 3], 1, 14);
 y0=[0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03];
@@ -11,30 +11,30 @@ for i=1:10000
     x0 = randi([0, 10], 1, 14);   
     x1 = [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03];
     x0 = [x0, x1];
-    % 没有线性或非线性约束，因此 A, b, Aeq, beq, lb, ub 均为空
+    % There are no linear or nonlinear constraints, so A, b, Aeq, beq, lb, ub are all empty
     A = -eye(28);
     b = zeros(28, 1);
 %     A = [];
 %     b = [];
     Aeq = [];
     beq = [];
-    lb = []; % 如果有变量下界，则在这里定义
-    ub = []; % 如果有变量上界，则在这里定义
-    % 使用 fmincon 求解
+    lb = []; % If there is a lower bound for a variable, it is defined here
+    ub = []; % If there is an upper bound on a variable, it is defined here
+    % fmincon solution
         options = optimoptions('fmincon', 'Display', 'iter', 'Algorithm', 'sqp');
         [x, fval] = fmincon(objective, x0, A, b, Aeq, beq, lb, ub, [], options);
         x0 = round(x * 10^4) / 10^4;
-        % 显示结果
+        % displaying results
         disp('Solution:');
         disp(x0);
         disp('Objective function value at the solution:');
         disp(fval);
 
-        % 检查残差是否足够小
+        % Check if the residual is small enough
         residual_norm = norm(residuals(x));
         disp(['Residual norm:', num2str(residual_norm)]);
 
-        % 如果残差足够小，可以认为找到了方程组的解
+        % If the residual is small enough, the solution to the system can be considered found
         if residual_norm < 1e-1
             disp('The solution is considered acceptable.');
             y = [y;x0];
@@ -44,24 +44,7 @@ for i=1:10000
 end
 tabulate(y(:,1))
 
-% %% 非线性最小二乘求解非线性方程组
-% x0 =randi([0, 3], 1, 28);  % 你的初始猜测值
-% options = optimoptions('fsolve','Display','iter','Algorithm','levenberg-marquardt');%'trust-region-dogleg',  'trust-region',  or 'levenberg-marquardt'
-% y0 = fsolve(@biological_interactions, x0, options);
-% y=y0;
-% flag=[0];
-% for i=1:1000
-%     x1 = randi([0, 3], 1, 28);
-%     options = optimoptions('fsolve','Display','iter','Algorithm','levenberg-marquardt');
-%     [y1,fval,exitflag] = fsolve(@biological_interactions, x1, options);
-%     y=[y;y1];
-%     flag = [flag;exitflag];
-% end
-% y=[y,flag];
-
-% [3.08389725293406,1.09897978544851,1.09906178071578,1.09533172982160,5.27080561784446,1.14312001496412,1.09906178770270,1.00809075312500,5.12550966057191,3.12387913336852,3.03374972798992,0.164634559326937,1.13697688416546,6.15563361571449e-15,0.0300000000000000,0.0300000000000000,0.0300000000000000,0.0300000000000000,4.95876646345197,0.0300000000000000,0.0299999999999999,0.0297197974691158,0.0300000000000000,0.0302361876129064,0.0302655899007002,0.0300000000000000,0.0300000000000000,1.00000000000000,1]
-% [3.18554098381210,1.09898018702481,1.09851412687297,1.09576281933053,4.52110552346914,1.14437149248092,1.09851412687286,1.97620208532647,5.12617129004484,3.12456192832875,3.03410657505845,0.164379337204067,1.13625921202820,0.969292486731593,0.0300000000000000,0.0300000000000000,0.0300000000000000,0.0300000000000000,0.0306901157010121,0.0300000000000000,0.0349171751726492,0.0151753897348182,0.0300000000000000,0.0302359808787129,0.0302654647133690,0.0300000000000000,0.0300000000000000,2.36451825930887e-15,1]
-%% 新网络
+%% network with BRD
 function F = biological_interactions(x) %the biological interactions between genes
 a=1.1;
 b=2;
