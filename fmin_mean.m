@@ -1,36 +1,36 @@
-%% ÄÚµã·¨Çó½âÔ¼Êø·ÇÏßĞÔ×îÓÅ»¯ÎÊÌâ
-% ½«·½³Ì×é×ª»»Îª²Ğ²îĞÎÊ½
+%% å†…ç‚¹æ³•æ±‚è§£çº¦æŸéçº¿æ€§æœ€ä¼˜åŒ–é—®é¢˜
+% å°†æ–¹ç¨‹ç»„è½¬æ¢ä¸ºæ®‹å·®å½¢å¼
 residuals = @(x) biological_interactions(x)
     
-% ¶¨ÒåÄ¿±êº¯Êı£¨²Ğ²îµÄÆ½·½ºÍ£©
+% å®šä¹‰ç›®æ ‡å‡½æ•°ï¼ˆæ®‹å·®çš„å¹³æ–¹å’Œï¼‰
 objective = @(x) sum(residuals(x).^2)
 y = randi([0, 3], 1, 14);
 for i=1:100
     x0 = randi([0, 10], 1, 14);   
-    % Ã»ÓĞÏßĞÔ»ò·ÇÏßĞÔÔ¼Êø£¬Òò´Ë A, b, Aeq, beq, lb, ub ¾ùÎª¿Õ
+    % æ²¡æœ‰çº¿æ€§æˆ–éçº¿æ€§çº¦æŸï¼Œå› æ­¤ A, b, Aeq, beq, lb, ub å‡ä¸ºç©º
     A = -eye(14);
     b = zeros(14, 1);
 %     A = [];
 %     b = [];
     Aeq = [];
     beq = [];
-    lb = []; % Èç¹ûÓĞ±äÁ¿ÏÂ½ç£¬ÔòÔÚÕâÀï¶¨Òå
-    ub = []; % Èç¹ûÓĞ±äÁ¿ÉÏ½ç£¬ÔòÔÚÕâÀï¶¨Òå
-    % Ê¹ÓÃ fmincon Çó½â
+    lb = []; % å¦‚æœæœ‰å˜é‡ä¸‹ç•Œï¼Œåˆ™åœ¨è¿™é‡Œå®šä¹‰
+    ub = []; % å¦‚æœæœ‰å˜é‡ä¸Šç•Œï¼Œåˆ™åœ¨è¿™é‡Œå®šä¹‰
+    % ä½¿ç”¨ fmincon æ±‚è§£
         options = optimoptions('fmincon', 'Display', 'iter', 'Algorithm', 'sqp');
         [x, fval] = fmincon(objective, x0, A, b, Aeq, beq, lb, ub, [], options);
         x0 = round(x * 10^8) / 10^8;
-        % ÏÔÊ¾½á¹û
+        % æ˜¾ç¤ºç»“æœ
         disp('Solution:');
         disp(x0);
         disp('Objective function value at the solution:');
         disp(fval);
 
-        % ¼ì²é²Ğ²îÊÇ·ñ×ã¹»Ğ¡
+        % æ£€æŸ¥æ®‹å·®æ˜¯å¦è¶³å¤Ÿå°
         residual_norm = norm(residuals(x));
         disp(['Residual norm:', num2str(residual_norm)]);
 
-        % Èç¹û²Ğ²î×ã¹»Ğ¡£¬¿ÉÒÔÈÏÎªÕÒµ½ÁË·½³Ì×éµÄ½â
+        % å¦‚æœæ®‹å·®è¶³å¤Ÿå°ï¼Œå¯ä»¥è®¤ä¸ºæ‰¾åˆ°äº†æ–¹ç¨‹ç»„çš„è§£
         if residual_norm < 1e-6
             disp('The solution is considered acceptable.');
             y = [y;x0];
@@ -39,7 +39,7 @@ for i=1:100
         end
 end
 tabulate(y(:,1))
-%% ĞÂÍøÂç
+%% ç½‘ç»œ
 function F = biological_interactions(x) %the biological interactions between genes
 a=1.1;
 b=2;
@@ -62,26 +62,4 @@ F(13)=a*x(5)^n/(s^n+x(5)^n)+a*x(12)^n/(s^n+x(12)^n)-k*x(13);
 F(14)=a*x(14)^n/(s^n+x(14)^n)-k*x(14);
 end
 
-%% Ô­ÍøÂç
-% function F = biological_interactions(x) %the biological interactions between genes
-% a=1;
-% b=2;
-% k=1;
-% n=3;
-% s=0.5;
-% F(1)=a*x(4)^n/(s^n+x(4)^n)+a*x(8)^n/(s^n+x(8)^n)+a*x(9)^n/(s^n+x(9)^n)+a*x(12)^n/(s^n+x(12)^n)-k*x(1);
-% F(2)=a*x(9)^n/(s^n+x(9)^n)-k*x(2);
-% F(3)=a*x(5)^n/(s^n+x(5)^n)+a*x(13)^n/(s^n+x(13)^n)-k*x(3);
-% F(4)=a*x(1)^n/(s^n+x(1)^n)-k*x(4);
-% F(5)=a*x(1)^n/(s^n+x(1)^n)+a*x(2)^n/(s^n+x(2)^n)+a*x(13)^n/(s^n+x(13)^n)+b*s^n/(s^n+x(6)^n)+b*s^n/(s^n+x(9)^n)+b*s^n/(s^n+x(12)^n)+b*s^n/(s^n+x(15)^n)-k*x(5);
-% F(6)=a*x(9)^n/(s^n+x(9)^n)+a*x(13)^n/(s^n+x(13)^n)+b*s^n/(s^n+x(5)^n)-k*x(6);
-% F(7)=a*x(9)^n/(s^n+x(9)^n)+a*x(5)^n/(s^n+x(5)^n)-k*x(7);
-% F(8)=a*x(1)^n/(s^n+x(1)^n)+a*x(5)^n/(s^n+x(5)^n)+a*x(15)^n/(s^n+x(15)^n)-k*x(8);
-% F(9)=a*x(1)^n/(s^n+x(1)^n)+a*x(3)^n/(s^n+x(3)^n)+a*x(4)^n/(s^n+x(4)^n)+a*x(7)^n/(s^n+x(7)^n)+a*x(8)^n/(s^n+x(8)^n)+b*s^n/(s^n+x(12)^n)-k*x(9);
-% F(10)=a*x(2)^n/(s^n+x(2)^n)+a*x(5)^n/(s^n+x(5)^n)+b*s^n/(s^n+x(7)^n)-k*x(10);
-% F(11)=b*s^n/(s^n+x(11)^n)+a*x(4)^n/(s^n+x(4)^n)+a*x(6)^n/(s^n+x(6)^n)-k*x(11);
-% F(12)=a*x(13)^n/(s^n+x(13)^n)-0.5*x(12);
-% F(13)=b*s^n/(s^n+x(1)^n)+b*s^n/(s^n+x(5)^n)+b*s^n/(s^n+x(6)^n)-k*x(13);
-% F(14)=a*x(10)^n/(s^n+x(10)^n)+a*x(11)^n/(s^n+x(11)^n)+a*x(13)^n/(s^n+x(13)^n)-k*x(14);
-% F(15)=a*x(15)^n/(s^n+x(15)^n)-k*x(15);
-% end
+
